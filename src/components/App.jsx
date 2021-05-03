@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Web3 from 'web3'
 
-import { Divider, Placeholder, Form, FormGroup, ControlLabel, FormControl, Button } from 'rsuite'
+import { Divider, Placeholder, Form, FormGroup, ControlLabel, FormControl, Button, List, AutoComplete, InputNumber } from 'rsuite'
 
 import 'rsuite/dist/styles/rsuite-default.css'
 import './style.scss'
@@ -10,44 +10,91 @@ const { Paragraph } = Placeholder
 
 export default class App extends React.Component {
     componentWillMount() {
-        this.loadBlockchainData(),
-        this.prubea()
-        this.trans()
+        this.loadBlockchainData()
+    }
+
+    async loadBlockchainData() {
+        this.web3 = new Web3("http://localhost:8721")
+        const accounts = await this.web3.eth.getAccounts()
+        console.log(accounts)
+        this.setState({ accounts: accounts })
       }
 
     constructor (props) {
         super(props)
 
+        this.web3 = null
+
         this.state = {
-            formValue: {name: null},
-            account: ''
-            
+            accounts: [],
+            from: null,
+            to: null,
+            key: null,
+            eth: 0.001
         }
+
+        this.handleChangeFrom = this.handleChangeFrom.bind(this)
+        this.handleChangeTo = this.handleChangeTo.bind(this)
+        this.handleChangeKey = this.handleChangeKey.bind(this)
+        this.handleChangeEth = this.handleChangeEth.bind(this)
+        this.transfer = this.transfer.bind(this)
+    }
+
+    handleChangeFrom(value) {
+        this.setState({
+          from: value
+        })
+    }
+
+    handleChangeTo(value) {
+        this.setState({
+          to: value
+        })
+    }
+
+    handleChangeKey(value) {
+        this.setState({
+          key: value
+        })
+    }
+
+    handleChangeEth(value) {
+        this.setState({
+            eth: value
+        })
+    }
+
+    transfer() {
+        this.trans()
+        console.log(this.state.from)
+        console.log(this.state.to)
+        console.log(this.state.key)
+        console.log(this.state.eth)
     }
     async trans(){
         
-        const privKey = '11de7e214b8fba5fe1a774abc90434e12105ae0105f01b07b028b92409a41a02'
-        const addressFrom = '0x111Cf7B6D381Cdd8c8ffd0819016CbF20e1019bB';
-        const addressTo = '0x59A808daC156a0d8A7a24fC9B77B0EDC8BDFA48A';
+        const privKey  = this.state.key
+        const addressFrom = this.state.from
+        const addressTo = this.state.to
 
-        const web3 = new Web3(Web3.givenProvider || "http://localhost:8721")
+        
 
         console.log(
             `Attempting to make transaction from ${addressFrom} to ${addressTo}`
          );
       
-         const createTransaction = await web3.eth.accounts.signTransaction(
+         const createTransaction = await this.web3.eth.accounts.signTransaction(
             {
                from: addressFrom,
                to: addressTo,
-               value: web3.utils.toWei('10', 'ether'),
+               value: this.web3.utils.toWei(this.state.eth, 'ether'),
                gas: '21000',
             },
             privKey
          );
       
          // Deploy transaction
-         const createReceipt = await web3.eth.sendSignedTransaction(
+         const createReceipt = await this.web3.eth.sendSignedTransaction(
             createTransaction.rawTransaction
          );
          console.log(
@@ -88,28 +135,70 @@ export default class App extends React.Component {
             <div style={{height: '100%'}} className='main'>
                 <div className='ranking' style={{height: '100%'}}>
                     <div className='titulo-ranking'>
-                        <h2>Ranking</h2>
-                        <p>Your account: {this.state.account}</p>
+                        <h2>Accounts</h2>
                     </div>
                     <div>
-                        <Paragraph rows={15} />
+                        <div>
+                            <List bordered style={{boxShadow: 'none'}}>
+                                {
+                                    this.state.accounts.map((item, index) => (
+                                        <List.Item
+                                            key={index}
+                                            index={index}
+                                            style={{backgroundColor: 'transparent', boxShadow: '0px 1px 2px #000'}}
+                                        >
+                                            {item}
+                                        </List.Item>
+                                    ))
+                                }
+                            </List>
+                        </div>
                     </div>
                 </div>
-                <Divider vertical style={{height: '100%'}} />
+
                 <div className='nombre-input' style={{height: '100%'}}>
-                    <h2>¡Construye tu conocimiento! PMBOK</h2>
+                    <h2 style={{color: 'black'}}>Realiza tu transacción</h2>
 
                     <div className='input'>
-                        <Form layout='horizontal' onChange={formValue => this.setState({formValue})}>
-                            <FormGroup>
-                                <ControlLabel>Ingresa tu nombre</ControlLabel>
-                                <FormControl name='name' />
-                            </FormGroup>
-                        </Form>
-
+                        <AutoComplete
+                            data={this.state.accounts}
+                            placeholder="Account from"
+                            onChange={this.handleChangeFrom}
+                            style={{width: '90%'}}
+                        />
                     </div>
 
-                    <Button color="green" block style={{width: '50%'}} disabled={!this.state.formValue.name}>¡A jugar!</Button>
+                    <div className='input'>
+                        <AutoComplete
+                            data={this.state.accounts}
+                            placeholder="Private key"
+                            onChange={this.handleChangeKey}
+                            style={{width: '90%'}}
+                        />
+                    </div>
+
+                    <div className='input'>
+                        <AutoComplete
+                            data={this.state.accounts}
+                            placeholder="Account to"
+                            onChange={this.handleChangeTo}
+                            style={{width: '90%'}}
+                        />
+                    </div>
+
+                    <div className='input'>
+                        <InputNumber
+                            defaultValue={0.001}
+                            step={0.001}
+                            postfix="ETH"
+                            onChange={this.handleChangeEth}
+                            style={{width: '90%'}}
+                        />
+                    </div>
+
+                    <div className='input'>
+                        <Button color="green" block style={{width: '50%'}} onClick={this.transfer}>Transferir</Button>
+                    </div>
 
                 </div>
             </div>
