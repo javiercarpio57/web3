@@ -41,7 +41,6 @@ export default class App extends React.Component {
 
     constructor (props) {
         super(props)
-
         this.web3 = null
 
         this.state = {
@@ -49,8 +48,14 @@ export default class App extends React.Component {
             from: null,
             to: null,
             key: null,
-            eth: 0.001,
-            balances: {}
+            balances: {},
+            eth: '0.001',
+            infoTo: '',
+            infoFrom: '',
+            infoBlock: '',
+            infoValue:'',
+            infoGas: '',
+            infoNonce: ''
         }
 
         this.handleChangeFrom = this.handleChangeFrom.bind(this)
@@ -91,7 +96,7 @@ export default class App extends React.Component {
         // console.log(this.state.to)
         // console.log(this.state.key)
         // console.log(this.state.eth)
-        this.getBalances()
+        // this.getBalances()
     }
 
     handleSortEnd({ oldIndex, newIndex }) {
@@ -113,25 +118,43 @@ export default class App extends React.Component {
 
         console.log(
             `Attempting to make transaction from ${addressFrom} to ${addressTo}`
-         );
-      
-         const createTransaction = await this.web3.eth.accounts.signTransaction(
-            {
-               from: addressFrom,
-               to: addressTo,
-               value: this.web3.utils.toWei(this.state.eth, 'ether'),
-               gas: '21000',
-            },
-            privKey
-         );
-      
-         // Deploy transaction
-         const createReceipt = await this.web3.eth.sendSignedTransaction(
-            createTransaction.rawTransaction
-         );
-         console.log(
-            `Transaction successful with hash: ${createReceipt.transactionHash}`
-         );
+        );
+    
+        const createTransaction = await this.web3.eth.accounts.signTransaction(
+        {
+            from: addressFrom,
+            to: addressTo,
+            value: this.web3.utils.toWei(this.state.eth, 'ether'),
+            gas: '21000',
+        },
+        privKey
+        )
+        //console.log(createTransaction)
+    
+        // Deploy transaction
+        const createReceipt = await this.web3.eth.sendSignedTransaction(
+        createTransaction.rawTransaction
+        );
+        console.log(
+        `Transaction successful with hash: ${createReceipt.transactionHash}`
+        );
+         
+        const infoTo = (await this.web3.eth.getTransaction(createReceipt.transactionHash)).to;
+        const infoFrom = (await this.web3.eth.getTransaction(createReceipt.transactionHash)).from;
+        const infoBlock =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).blockNumber;
+        const infoValue = (await this.web3.eth.getTransaction(createReceipt.transactionHash)).value / (1 * Math.pow(10, 18));
+        const infoGas =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).gas;
+        const infoNonce =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).nonce;
+
+        this.setState({
+            infoTo,
+            infoFrom,
+            infoBlock,
+            infoValue,
+            infoGas,
+            infoNonce
+        })
+        this.getBalances()
     }
 
     render () {
@@ -208,24 +231,24 @@ export default class App extends React.Component {
             
                 <div className='card'>
                     <Panel shaded bordered bodyFill style={{ display: 'inline-block', width: 400 }}>
-                        <Panel header="Última transacción">
-                            <p>
-                                <small>Nonce: {}</small>
+                        <Panel header="Última transacción" style={{color: 'black'}}>
+                            <p style={{color: 'black'}}>
+                                <small>Nonce: {this.state.infoNonce}</small>
                             </p>
-                            <p>
-                                <small>Block number: {}</small>
+                            <p style={{color: 'black'}}>
+                                <small>Block number: {this.state.infoBlock}</small>
                             </p>
-                            <p>
-                                <small>From: {}</small>
+                            <p style={{color: 'black'}}>
+                                <small>From: {this.state.infoFrom}</small>
                             </p>
-                            <p>
-                                <small>To: {}</small>
+                            <p style={{color: 'black'}}>
+                                <small>To: {this.state.infoTo}</small>
                             </p>
-                            <p>
-                                <small>Value: {}</small>
+                            <p style={{color: 'black'}}>
+                                <small>Value: {this.state.infoValue}</small>
                             </p>
-                            <p>
-                                <small>Gas: {}</small>
+                            <p style={{color: 'black'}}>
+                                <small>Gas: {this.state.infoGas}</small>
                             </p>
                         </Panel>
                     </Panel>
