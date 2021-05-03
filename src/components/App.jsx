@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Web3 from 'web3'
 
-import { Divider, Placeholder, Form, FormGroup, ControlLabel, FormControl, Button, List, AutoComplete } from 'rsuite'
+import { Divider, Placeholder, Form, FormGroup, ControlLabel, FormControl, Button, List, AutoComplete, InputNumber } from 'rsuite'
 
 import 'rsuite/dist/styles/rsuite-default.css'
 import './style.scss'
@@ -14,8 +14,8 @@ export default class App extends React.Component {
     }
 
     async loadBlockchainData() {
-        const web3 = new Web3("http://localhost:8721")
-        const accounts = await web3.eth.getAccounts()
+        this.web3 = new Web3("http://localhost:8721")
+        const accounts = await this.web3.eth.getAccounts()
         console.log(accounts)
         this.setState({ accounts: accounts })
       }
@@ -23,15 +23,21 @@ export default class App extends React.Component {
     constructor (props) {
         super(props)
 
+        this.web3 = null
+
         this.state = {
             accounts: [],
-            // formValue: {from: null},
             from: null,
-            to: null
+            to: null,
+            key: null,
+            eth: 0.001
         }
 
         this.handleChangeFrom = this.handleChangeFrom.bind(this)
         this.handleChangeTo = this.handleChangeTo.bind(this)
+        this.handleChangeKey = this.handleChangeKey.bind(this)
+        this.handleChangeEth = this.handleChangeEth.bind(this)
+        this.transfer = this.transfer.bind(this)
     }
 
     handleChangeFrom(value) {
@@ -45,6 +51,25 @@ export default class App extends React.Component {
           to: value
         })
     }
+
+    handleChangeKey(value) {
+        this.setState({
+          key: value
+        })
+    }
+
+    handleChangeEth(value) {
+        this.setState({
+            eth: value
+        })
+    }
+
+    transfer() {
+        console.log(this.state.from)
+        console.log(this.state.to)
+        console.log(this.state.key)
+        console.log(this.state.eth)
+    }
     
     render () {
         return (
@@ -55,21 +80,25 @@ export default class App extends React.Component {
                     </div>
                     <div>
                         <div>
-                            <List bordered>
+                            <List bordered style={{boxShadow: 'none'}}>
                                 {
                                     this.state.accounts.map((item, index) => (
-                                    <List.Item key={index} index={index} style={{backgroundColor: 'transparent', boxShadow: '0 -1px 0 #000, 0 1px 0 #000'}}>
-                                        {item}
-                                    </List.Item>
+                                        <List.Item
+                                            key={index}
+                                            index={index}
+                                            style={{backgroundColor: 'transparent', boxShadow: '0px 1px 2px #000'}}
+                                        >
+                                            {item}
+                                        </List.Item>
                                     ))
                                 }
                             </List>
                         </div>
                     </div>
                 </div>
-                <Divider vertical style={{height: '100%'}} />
+
                 <div className='nombre-input' style={{height: '100%'}}>
-                    <h2>Realiza tu transacción</h2>
+                    <h2 style={{color: 'black'}}>Realiza tu transacción</h2>
 
                     <div className='input'>
                         <AutoComplete
@@ -83,13 +112,34 @@ export default class App extends React.Component {
                     <div className='input'>
                         <AutoComplete
                             data={this.state.accounts}
+                            placeholder="Private key"
+                            onChange={this.handleChangeKey}
+                            style={{width: '90%'}}
+                        />
+                    </div>
+
+                    <div className='input'>
+                        <AutoComplete
+                            data={this.state.accounts}
                             placeholder="Account to"
                             onChange={this.handleChangeTo}
                             style={{width: '90%'}}
                         />
                     </div>
 
-                    {/* <Button color="green" block style={{width: '50%'}} disabled={!this.state.formValue.name}>¡A jugar!</Button> */}
+                    <div className='input'>
+                        <InputNumber
+                            defaultValue={0.001}
+                            step={0.001}
+                            postfix="ETH"
+                            onChange={this.handleChangeEth}
+                            style={{width: '90%'}}
+                        />
+                    </div>
+
+                    <div className='input'>
+                        <Button color="green" block style={{width: '50%'}} onClick={this.transfer}>Transferir</Button>
+                    </div>
 
                 </div>
             </div>
