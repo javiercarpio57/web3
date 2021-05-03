@@ -30,7 +30,15 @@ export default class App extends React.Component {
             from: null,
             to: null,
             key: null,
-            eth: 0.001
+            eth: '0.001',
+            infoTo: '',
+            infoFrom: '',
+            infoBlock: '',
+            infoValue:'',
+            infoGas: '',
+            infoNonce: ''
+
+
         }
 
         this.handleChangeFrom = this.handleChangeFrom.bind(this)
@@ -92,7 +100,8 @@ export default class App extends React.Component {
                gas: '21000',
             },
             privKey
-         );
+         )
+         //console.log(createTransaction)
       
          // Deploy transaction
          const createReceipt = await this.web3.eth.sendSignedTransaction(
@@ -101,6 +110,15 @@ export default class App extends React.Component {
          console.log(
             `Transaction successful with hash: ${createReceipt.transactionHash}`
          );
+         
+         this.infoTo = (await this.web3.eth.getTransaction(createReceipt.transactionHash)).to;
+         
+         this.infoFrom = (await this.web3.eth.getTransaction(createReceipt.transactionHash)).from;
+
+         this.infoBlock =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).blockNumber;
+         this.infoValue =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).value;
+         this.infoGas =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).gas;
+         this.infoNonce =(await this.web3.eth.getTransaction(createReceipt.transactionHash)).nonce;
     }
     
     async balance(){
