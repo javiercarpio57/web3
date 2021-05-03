@@ -70,6 +70,7 @@ export default class App extends React.Component {
         console.log(this.state.to)
         console.log(this.state.key)
         console.log(this.state.eth)
+        this.balance()
     }
     async trans(){
         
@@ -102,30 +103,24 @@ export default class App extends React.Component {
          );
     }
     
-    async prubea(){
+    async balance(){
         await(90);
-        const addressFrom = '0x111Cf7B6D381Cdd8c8ffd0819016CbF20e1019bB';
-        const addressTo = '0x59A808daC156a0d8A7a24fC9B77B0EDC8BDFA48A';
+        const privKey  = this.state.key
+        const addressFrom = this.state.from
+        const addressTo = this.state.to
 
-        const web3 = new Web3(Web3.givenProvider || "http://localhost:8721")
-
-        const balanceFrom = web3.utils.fromWei(
-            await web3.eth.getBalance(addressFrom),
+        const balanceFrom = this.web3.utils.fromWei(
+            await this.web3.eth.getBalance(addressFrom),
             'ether'
          );
-         const balanceTo = await web3.utils.fromWei(
-            await web3.eth.getBalance(addressTo),
+         const balanceTo = await this.web3.utils.fromWei(
+            await this.web3.eth.getBalance(addressTo),
             'ether'
          );
       
          console.log(`The balance of ${addressFrom} is: ${balanceFrom} ETH.`);
          console.log(`The balance of ${addressTo} is: ${balanceTo} ETH.`);
     }
-    async loadBlockchainData() {
-        const web3 = new Web3(Web3.givenProvider || "http://localhost:8721")
-        const accounts = await web3.eth.getAccounts()
-        this.setState({ account: accounts[0] })
-      }
 
     render () {
        
