@@ -1,0 +1,45 @@
+{
+  "name": "pmbok",
+  "version": "1.0.0",
+  "description": "Juego de PMBOK",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --open",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/javiercarpio57/Admin_TI"
+  },
+  "author": "Javier Carpio",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-react": "^7.7.4",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
+    "copy-webpack-plugin": "^5.0.5",
+    "css-loader": "^3.2.0",
+    "cssnano": "^4.1.10",
+    "eslint": "^6.7.0",
+    "eslint-loader": "^3.0.2",
+    "file-loader": "^4.3.0",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.14.1",
+    "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "rsuite": "^4.8.1",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
+    "svg-url-loader": "^3.0.3",
+    "url-loader": "^2.3.0",
+    "web3": "^1.3.5",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

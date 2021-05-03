@@ -1,0 +1,28 @@
+
+.ranking {
+    background-color: lavender;;
+    width: 30%;
+}
+
+.titulo-ranking {
+    text-align: center;
+    margin: 10%;
+}
+
+.nombre-input {
+    background-color: burlywood;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.input {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.main {
+    display: flex;
+}
