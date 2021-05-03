@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
 import Web3 from 'web3'
 
-import { Divider, Placeholder, Form, FormGroup, ControlLabel, FormControl, Button, List, AutoComplete, InputNumber } from 'rsuite'
+import { Button, List, AutoComplete, InputNumber, Panel } from 'rsuite'
 
 import 'rsuite/dist/styles/rsuite-default.css'
 import './style.scss'
-
-const { Paragraph } = Placeholder
 
 export default class App extends React.Component {
     componentWillMount() {
@@ -18,7 +16,28 @@ export default class App extends React.Component {
         const accounts = await this.web3.eth.getAccounts()
         console.log(accounts)
         this.setState({ accounts: accounts })
-      }
+
+        this.getBalances()
+    }
+    
+    async getBalances() {
+        const balances = {}
+        const accounts = this.state.accounts
+    
+        await Promise.all(
+            accounts.map(async (account) => {
+                const balance = this.web3.utils.fromWei(
+                    await this.web3.eth.getBalance(account),
+                    'ether'
+                );
+                balances[account] = balance
+            })
+        )
+        console.log(balances)
+        this.setState({
+            balances: balances
+        })
+    }
 
     constructor (props) {
         super(props)
@@ -30,7 +49,8 @@ export default class App extends React.Component {
             from: null,
             to: null,
             key: null,
-            eth: 0.001
+            eth: 0.001,
+            balances: {}
         }
 
         this.handleChangeFrom = this.handleChangeFrom.bind(this)
@@ -38,6 +58,7 @@ export default class App extends React.Component {
         this.handleChangeKey = this.handleChangeKey.bind(this)
         this.handleChangeEth = this.handleChangeEth.bind(this)
         this.transfer = this.transfer.bind(this)
+        this.handleSortEnd = this.handleSortEnd.bind(this);
     }
 
     handleChangeFrom(value) {
@@ -66,19 +87,29 @@ export default class App extends React.Component {
 
     transfer() {
         this.trans()
-        console.log(this.state.from)
-        console.log(this.state.to)
-        console.log(this.state.key)
-        console.log(this.state.eth)
-        this.balance()
+        // console.log(this.state.from)
+        // console.log(this.state.to)
+        // console.log(this.state.key)
+        // console.log(this.state.eth)
+        this.getBalances()
     }
+
+    handleSortEnd({ oldIndex, newIndex }) {
+        this.setState(({ accounts }) => {
+          const moveData = accounts.splice(oldIndex, 1);
+          const newData = [...accounts];
+          newData.splice(newIndex, 0, moveData[0]);
+          return {
+            accounts: newData
+          };
+        });
+      }
+
     async trans(){
         
         const privKey  = this.state.key
         const addressFrom = this.state.from
         const addressTo = this.state.to
-
-        
 
         console.log(
             `Attempting to make transaction from ${addressFrom} to ${addressTo}`
@@ -102,47 +133,25 @@ export default class App extends React.Component {
             `Transaction successful with hash: ${createReceipt.transactionHash}`
          );
     }
-    
-    async balance(){
-        await(90);
-        const privKey  = this.state.key
-        const addressFrom = this.state.from
-        const addressTo = this.state.to
-
-        const balanceFrom = this.web3.utils.fromWei(
-            await this.web3.eth.getBalance(addressFrom),
-            'ether'
-         );
-         const balanceTo = await this.web3.utils.fromWei(
-            await this.web3.eth.getBalance(addressTo),
-            'ether'
-         );
-      
-         console.log(`The balance of ${addressFrom} is: ${balanceFrom} ETH.`);
-         console.log(`The balance of ${addressTo} is: ${balanceTo} ETH.`);
-    }
 
     render () {
-       
-        
-        
         return (
             <div style={{height: '100%'}} className='main'>
                 <div className='ranking' style={{height: '100%'}}>
                     <div className='titulo-ranking'>
-                        <h2>Accounts</h2>
+                        <h2 style={{color: 'black'}}>Accounts</h2>
                     </div>
                     <div>
                         <div>
-                            <List bordered style={{boxShadow: 'none'}}>
+                            <List sortable onSort={this.handleSortEnd} bordered style={{boxShadow: 'none'}}>
                                 {
                                     this.state.accounts.map((item, index) => (
                                         <List.Item
                                             key={index}
                                             index={index}
-                                            style={{backgroundColor: 'transparent', boxShadow: '0px 1px 2px #000'}}
+                                            style={{backgroundColor: 'transparent', boxShadow: '0px 1px 2px #000', fontSize: '12px'}}
                                         >
-                                            {item}
+                                            {item}  @  {this.state.balances[item]} ETH
                                         </List.Item>
                                     ))
                                 }
@@ -195,6 +204,31 @@ export default class App extends React.Component {
                         <Button color="green" block style={{width: '50%'}} onClick={this.transfer}>Transferir</Button>
                     </div>
 
+                </div>
+            
+                <div className='card'>
+                    <Panel shaded bordered bodyFill style={{ display: 'inline-block', width: 400 }}>
+                        <Panel header="Última transacción">
+                            <p>
+                                <small>Nonce: {}</small>
+                            </p>
+                            <p>
+                                <small>Block number: {}</small>
+                            </p>
+                            <p>
+                                <small>From: {}</small>
+                            </p>
+                            <p>
+                                <small>To: {}</small>
+                            </p>
+                            <p>
+                                <small>Value: {}</small>
+                            </p>
+                            <p>
+                                <small>Gas: {}</small>
+                            </p>
+                        </Panel>
+                    </Panel>
                 </div>
             </div>
         )

@@ -15,8 +15,9 @@
     width: 70%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
+    padding-top: 50px;
 }
 
 .input {
@@ -27,4 +28,12 @@
 
 .main {
     display: flex;
+}
+
+.card {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
